@@ -6,22 +6,21 @@ export NDK_ROOT="$HOME/Android/Sdk/ndk-bundle"
 export QT_ROOT="/opt/Qt/5.7"
 
 #SR="$NDK_ROOT/platforms/android-24/arch-x86"
-SR="$NDK_ROOT/platforms/android-24/arch-arm"
-
 #BR="$NDK_ROOT/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-"
-BR="$NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-"
-
 #platform=android-x86
-platform=android-armv7
-
+#platform_sort=x86
 #qmake="$QT_ROOT/android_x86/bin/qmake"
+
+SR="$NDK_ROOT/platforms/android-24/arch-arm"
+BR="$NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-"
+platform=android-armv7
+platform_sort=arm
 qmake="$QT_ROOT/android_armv7/bin/qmake"
 
 libiconv_pkg=libiconv-1.14.tar.gz
-openssl_pkg=openssl-1.0.2d.tar.gz
-mariadb_pkg=mariadb-connector-c-2.2.3-src.tar.gz
-qtbase_pkg=qtbase-opensource-src-5.7.0.tar.gz
-
+openssl_pkg=openssl-1.0.2j.tar.gz
+mariadb_pkg=mariadb-connector-c-2.3.2-src.tar.gz
+qtbase_pkg=qtbase-opensource-src-5.7.1.tar.gz
 
 # Don't edit after this line
 
@@ -32,7 +31,7 @@ rm -r $dir
 tar -xf $libiconv_pkg || exit 1
 
 pushd $dir
-        STRIP="$BR"strip RANLIB="$BR"ranlib OBJDUMP="$BR"objdump AR="$BR"ar CC="$BR"gcc CFLAGS=--sysroot=$SR CPP="$BR"cpp CPPFLAGS=$CFLAGS ./configure --host=arm --prefix=$SR/usr --with-sysroot=$SR
+        STRIP="$BR"strip RANLIB="$BR"ranlib OBJDUMP="$BR"objdump AR="$BR"ar CC="$BR"gcc CFLAGS=--sysroot=$SR CPP="$BR"cpp CPPFLAGS=$CFLAGS ./configure --host=$platform_sort --prefix=$SR/usr --with-sysroot=$SR
         make || exit 1
         make install || exit 1
 popd
@@ -40,7 +39,7 @@ popd
 echo
 echo "libiconv compiled !!!"
 echo
- 
+
 # openssl compile
 dir=$(basename $openssl_pkg .tar.gz)
 
@@ -49,7 +48,6 @@ tar -xf $openssl_pkg || exit 1
 
 pushd $dir
         RANLIB="$BR"ranlib CC="$BR"gcc ./Configure $platform --prefix=$SR/usr
-        ANDROID_DEV=$SR/usr make #|| exit 1
         ANDROID_DEV=$SR/usr make || exit 1
         make install_sw || exit 1
 popd
@@ -66,7 +64,7 @@ tar -xf $mariadb_pkg || exit 1
 
 pushd $dir
         sed -i -e "s|ADD_SUBDIRECTORY(unittest/libmariadb)|#ADD_SUBDIRECTORY(unittest/libmariadb)|" CMakeLists.txt
-        sed -i -e "N; s|typedef unsigned short ushort;\n#endif|#endif\ntypedef unsigned short ushort;|" include/my_global.h
+        sed -i -e "N; s|#define _global_h|#define _global_h\n\n#ifndef ushort\n#define ushort uint16\n#endif|" include/my_global.h
         sed -i -e "N; s|SET_TARGET_PROPERTIES(libmariadb PROPERTIES VERSION.*||" libmariadb/CMakeLists.txt
         sed -i -e "N; s|SOVERSION \${CPACK_PACKAGE_VERSION_MAJOR})||" libmariadb/CMakeLists.txt 
         sed -i -e "N; s|\${CPACK_PACKAGE_VERSION_MAJOR}||" libmariadb/CMakeLists.txt
@@ -94,7 +92,7 @@ pushd $dir
 		sed -i -e "N; s|#define HAVE_GETPWNAM 1|/* #undef HAVE_GETPWNAM */|" my_config.h
 		sed -i -e "N; s|#define HAVE_STPCPY 1|/* #undef HAVE_STPCPY */|" my_config.h
 		popd
-		make
+		make || exit 1
 		make install || exit 1
 		popd
 popd
@@ -126,4 +124,5 @@ popd
 echo
 echo "qt mariadb driver compiled !!!"
 echo
+
  
