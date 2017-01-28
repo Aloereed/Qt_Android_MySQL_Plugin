@@ -2,8 +2,8 @@
 
 # Edit these lines
 
-export NDK_ROOT="$HOME/Android/Sdk/ndk-bundle"
-export QT_ROOT="/opt/Qt/5.7"
+export NDK_ROOT="/home/aykut/Android/Sdk/ndk-bundle"
+export QT_ROOT="/opt/Qt/5.8"
 
 #SR="$NDK_ROOT/platforms/android-24/arch-x86"
 #BR="$NDK_ROOT/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-"
@@ -20,7 +20,7 @@ qmake="$QT_ROOT/android_armv7/bin/qmake"
 libiconv_pkg=libiconv-1.14.tar.gz
 openssl_pkg=openssl-1.0.2j.tar.gz
 mariadb_pkg=mariadb-connector-c-2.3.2-src.tar.gz
-qtbase_pkg=qtbase-opensource-src-5.7.1.tar.gz
+qtbase_pkg=qtbase-opensource-src-5.8.0.tar.gz
 
 # Don't edit after this line
 
@@ -39,6 +39,7 @@ popd
 echo
 echo "libiconv compiled !!!"
 echo
+rm -r $dir
 
 # openssl compile
 dir=$(basename $openssl_pkg .tar.gz)
@@ -55,6 +56,7 @@ popd
 echo
 echo "openssl compiled !!!"
 echo
+rm -r $dir
 
 # mariadb compile
 dir=$(basename $mariadb_pkg .tar.gz)
@@ -100,6 +102,7 @@ popd
 echo
 echo "mariadb compiled !!!"
 echo
+rm -r $dir
 
 # qt mariadb driver compile 
 export ANDROID_NDK_ROOT=$NDK_ROOT
@@ -112,17 +115,21 @@ tar -xf $qtbase_pkg || exit 1
 [ ! -f "$qmake" ] && { echo "Could not find qmake in '$qmake'"; exit 1; }
 [ ! -x "$qmake" ] && { echo "Qmake is not executable in '$qmake'"; exit 1; }
 
-pushd $dir/src/plugins/sqldrivers/mysql/
+echo
+echo "Root privileges is needed for compiling and installing the driver !!!"
+echo 
+
+pushd $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/
+        make clean
         $qmake "INCLUDEPATH+=$SR/usr/include/mariadb" "LIBS+=-L$SR/usr/lib/mariadb -lmysqlclient_r" -o Makefile mysql.pro
         make || exit 1
-        echo
-        echo "Root privileges is needed for installing the driver !!!"
-        echo
-        sudo make install
+        make install || exit 1
 popd
 
 echo
 echo "qt mariadb driver compiled !!!"
 echo
+rm -r $dir
+
 
  
