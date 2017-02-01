@@ -109,11 +109,26 @@ export ANDROID_NDK_ROOT=$NDK_ROOT
 [ ! -f "$qmake" ] && { echo "Could not find qmake in '$qmake'"; exit 1; }
 [ ! -x "$qmake" ] && { echo "Qmake is not executable in '$qmake'"; exit 1; }
 
+# Fix Qt MySQL projects
+cp $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/mysql.pro $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/mysql_orig.pro
+cp ./android_mysql.pro $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/mysql.pro
+
+restore() {
+        cp ./mysql_orig.pro ./mysql.pro
+        rm ./mysql_orig.pro
+}
+
+restore_and_exit() {
+        restore
+        exit 1
+}
+        
 pushd $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/
         make clean
         $qmake "INCLUDEPATH+=$SR/usr/include/mariadb" "LIBS+=-L$SR/usr/lib/mariadb -lmysqlclient_r" -o Makefile mysql.pro
-        make || exit 1
-        make install || exit 1
+        make || restore_and_exit
+        make install || restore_and_exit
+        restore
 popd
 
 echo
