@@ -20,7 +20,6 @@ qmake="$QT_ROOT/android_armv7/bin/qmake"
 libiconv_pkg=libiconv-1.14.tar.gz
 openssl_pkg=openssl-1.0.2j.tar.gz
 mariadb_pkg=mariadb-connector-c-2.3.2-src.tar.gz
-qtbase_pkg=qtbase-opensource-src-5.8.0.tar.gz
 
 # Don't edit after this line
 
@@ -107,17 +106,8 @@ rm -r $dir
 # qt mariadb driver compile 
 export ANDROID_NDK_ROOT=$NDK_ROOT
 
-dir=$(basename $qtbase_pkg .tar.gz)
-
-rm -r $dir
-tar -xf $qtbase_pkg || exit 1
-
 [ ! -f "$qmake" ] && { echo "Could not find qmake in '$qmake'"; exit 1; }
 [ ! -x "$qmake" ] && { echo "Qmake is not executable in '$qmake'"; exit 1; }
-
-echo
-echo "Root privileges is needed for compiling and installing the driver !!!"
-echo 
 
 pushd $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/
         make clean
@@ -129,7 +119,4 @@ popd
 echo
 echo "qt mariadb driver compiled !!!"
 echo
-rm -r $dir
 
-
- 
