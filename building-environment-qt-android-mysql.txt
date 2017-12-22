@@ -1,0 +1,41 @@
+Configurazione ambiente di sviluppo Qt Android su Linux (64bit)
+
+N.B: tutti i seguenti comandi da terminale devono essere preceduti da sudo per ottenere i permessi da amministratore.
+
+* apt-get update
+* apt-get upgrade
+* apt-get install build-essential libgl1-mesa-dev cmake perl openssh-server git
+
+* fix umake per installazione android studio:
+	-> sudo add-apt-repository ppa:lyzardking/ubuntu-make
+	-> sudo apt-get update
+	-> sudo apt-get install ubuntu-make
+
+* installare android studio:
+	-> sudo umake android
+
+* avvio android studio e installo SDK r21 (importante perchè l'ultima a cui l'NDK r10e arriva)
+* download android NDK r10e, necessario a Qt, e lo scompatto in cartella SDK
+
+* download qt online installer e installo (per dargli i permessi di esecuzione 'chmod +x'):
+	-> 5.9.3 Android armv7
+	-> 5.9.3 Sources
+	-> 5.9.3 Desktop gcc 64-bit
+
+* configurare Qt Creator inserendo nella sezione Android i path per l'SDK e l'NDK r10e
+
+
+
+Istruzioni building Plugin QtSQL MySQL per Android
+
+* Repository originale per script plugin MySQL per Android: https://bitbucket.org/aykutozdemir/mysql_driver_qt/
+* Repository di backup di Ruscelli Fabio: https://github.com/fabiorush92/Qt_Android_MySQL_Plugin
+
+* git clone <plugin_repo>
+* cd <plugin_repo>
+* sudo chmod +x build_qt_mysql_driver.sh
+* ./build_qt_mysql_driver.sh
+* ... attendere termine building dei vari pacchetti ...
+* se il building terminerà con successo il driver QSqlMySQL sarà già copiato nei binari di Qt
+* ricorda di aggiungere alle dipendenze del progetto Qt Android la libreria libmariadb.so, appena buildata e contenuta in:
+	-> <NDK_r10e>/platforms/android-21/arch-arm/usr/lib/mariadb
