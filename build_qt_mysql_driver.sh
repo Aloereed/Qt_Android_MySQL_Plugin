@@ -2,16 +2,10 @@
 
 # Edit these lines
 
-export NDK_ROOT="/home/aykut/Android/Sdk/ndk-bundle"
-export QT_ROOT="/opt/Qt/5.8"
+export NDK_ROOT="/home/rush/Android/Sdk/ndk-r10e"
+export QT_ROOT="/home/rush/Qt/5.9.3"
 
-#SR="$NDK_ROOT/platforms/android-24/arch-x86"
-#BR="$NDK_ROOT/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-"
-#platform=android-x86
-#platform_sort=x86
-#qmake="$QT_ROOT/android_x86/bin/qmake"
-
-SR="$NDK_ROOT/platforms/android-24/arch-arm"
+SR="$NDK_ROOT/platforms/android-21/arch-arm"
 BR="$NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-"
 platform=android-armv7
 platform_sort=arm
