@@ -7,9 +7,11 @@ export QT_ROOT="/home/rush/Qt/5.9.3"
 
 SR="$NDK_ROOT/platforms/android-21/arch-arm"
 BR="$NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-"
+# BR="$NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64/bin/arm-linux-androideabi-"
 platform=android-armv7
 platform_sort=arm
-qmake="$QT_ROOT/android_armv7/bin/qmake"
+# qmake of new Qt is in dir below
+qmake="$QT_ROOT/android/bin/qmake"
 
 libiconv_pkg=libiconv-1.14.tar.gz
 openssl_pkg=openssl-1.0.2j.tar.gz
@@ -52,6 +54,7 @@ echo
 rm -r $dir
 
 # mariadb compile
+# must be acted in Linux or WSL
 dir=$(basename $mariadb_pkg .tar.gz)
 
 rm -r $dir
@@ -103,7 +106,7 @@ export ANDROID_NDK_ROOT=$NDK_ROOT
 [ ! -f "$qmake" ] && { echo "Could not find qmake in '$qmake'"; exit 1; }
 [ ! -x "$qmake" ] && { echo "Qmake is not executable in '$qmake'"; exit 1; }
 
-# Fix Qt MySQL projects
+# Backup & Fix Qt MySQL projects
 cp $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/mysql.pro $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/mysql_orig.pro
 cp ./android_mysql.pro $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/mysql.pro
 
@@ -124,7 +127,7 @@ pushd $QT_ROOT/Src/qtbase/src/plugins/sqldrivers/mysql/
         make install || restore_and_exit
         restore
 popd
-
+# sometimes libmysqlclient_r.so is empty, you need to copy libmariadb.so to it. (They are the same.)
 echo
 echo "qt mariadb driver compiled !!!"
 echo
